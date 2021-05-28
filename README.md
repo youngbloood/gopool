@@ -1,10 +1,10 @@
 
-# GOPOOL
+# gopool
 goroutine pool in golang. you can expan the goroutine number dynamic.
 
 
 
-# MODE
+# mode
 ```
                            v
                            | 
@@ -30,7 +30,7 @@ goroutine pool in golang. you can expan the goroutine number dynamic.
 
 node invoke the function to handle `v`
 
-# USAGE
+# usage
 
 ```
 import "github.com/youngbloood/gopool"
@@ -48,7 +48,7 @@ pool.Done(4)                  // now goroutine number is 3 in pool
 pool.Send(v)
 ```
 
-# BENCHMARK
+# benchmark
 
 ## without goroutine pool
 ```
