@@ -185,7 +185,10 @@ Q: how deal with ErrTimeOut?
 A: then pool get a channel from queue, and send a v(interface{}) into the queue , it may be timeout, if recieve ErrTimeOut, then you can send many times.
 
 Q: how much size should set in goroutine pool?
-A: refer the benchmark
+A: refer the benchmark.
 
 Q: how to work with queue and queue.Pop()?
 A: queue is a double link list, Pop() the head and return head-node, and then push the node into queue tail, then pool can send v into the head-node's channel.
+
+Q: when invoke function `.Done(size int)` to reduce the goroutine in pool, Will the data be lost?
+A: Done is a lazy reduce, when invoke it, it will mark reduce number in queue, after the `Pop()`, close(channel) reduce the goroutine number really.
