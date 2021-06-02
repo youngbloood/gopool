@@ -176,3 +176,16 @@ BenchmarkSendParallel/go4600-4	535797       2186 ns/op               7 B/op	    
 PASS
 ok      github.com/youngbloood/gopool
 ```
+
+# Q&A
+Q: how deal with ErrNotIdle?
+A: if recieve ErrNotIdle , may be the goroutine pool size is 0, and invoke `.Add(size int)` to expan the pool.
+
+Q: how deal with ErrTimeOut?
+A: then pool get a channel from queue, and send a v(interface{}) into the queue , it may be timeout, if recieve ErrTimeOut, then you can send many times.
+
+Q: how much size should set in goroutine pool?
+A: refer the benchmark
+
+Q: how to work with queue and queue.Pop()?
+A: queue is a double link list, Pop() the head and return head-node, and then push the node into queue tail, then pool can send v into the head-node's channel.
