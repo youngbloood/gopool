@@ -15,4 +15,5 @@ func SetHook(hook HookError) {
 var (
 	ErrTimeOut = errors.New("send timeout!")
 	ErrNotIdle = errors.New("no idle goroutine!")
+	ErrStoped  = errors.New("gopool stoped!")
 )
