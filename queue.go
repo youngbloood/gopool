@@ -21,7 +21,7 @@ type queue struct {
 
 type queuer interface {
 	Pop() *goChan
-	Expan(int, func(*goChan))
+	Expand(int, func(*goChan))
 }
 
 func newNode() *node {
@@ -88,7 +88,7 @@ func (q *queue) Pop() *goChan {
 	return val
 }
 
-func (q *queue) Expan(size int, run func(*goChan)) {
+func (q *queue) Expand(size int, run func(*goChan)) {
 	if size == 0 {
 		return
 	}
