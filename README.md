@@ -181,7 +181,7 @@ ok      github.com/youngbloood/gopool
 # Q&A
 Q: how deal with ErrNotIdle?
 
-A: if recieve ErrNotIdle , may be the goroutine pool size is 0, and invoke `.Add(size int)` to expan the pool.
+A: if recieve ErrNotIdle , may be the goroutine pool size is 0, and invoke `.Expand(add int)` to expan the pool.
 
 Q: how deal with ErrTimeOut?
 
@@ -197,6 +197,6 @@ Q: how to work with queue and queue.Pop()?
 A: queue is a double link list, Pop() the head and return head-node, and then push the node into queue tail, then pool can send v into the head-node's channel.
 
 
-Q: when invoke function `.Done(size int)` to reduce the goroutine in pool, Will the data be lost?
+Q: when invoke function `.Expand(reduce int)` to reduce the goroutine in pool, Will the data be lost?
 
 A: Done is a lazy reduce, when invoke it, it will mark reduce number in queue, after the `Pop()`, close(channel) reduce the goroutine number really.
