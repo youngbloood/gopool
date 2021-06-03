@@ -6,13 +6,13 @@ import (
 )
 
 type goPool struct {
-	rwMux   sync.RWMutex // 针对queue的Pop()加锁，防止done() pop一个删除的数据时，Send同时发生引发错误
-	size    int
-	queue   queuer
-	run     Run
-	isStart bool
-	once    sync.Once
-	sendTTL *time.Ticker
+	rwMux           sync.RWMutex // 针对queue的Pop()加锁，防止done() pop一个删除的数据时，Send同时发生引发错误
+	size            int
+	queue           queuer
+	run             Run
+	isStart, isStop bool
+	once            sync.Once
+	sendTTL         *time.Ticker
 }
 
 func New(size int, run Run) *goPool {
@@ -68,6 +68,10 @@ func (gp *goPool) Send(v interface{}, ttls ...time.Duration) error {
 	gp.rwMux.RLock()
 	defer gp.rwMux.RUnlock()
 
+	if gp.isStop {
+		return ErrStoped
+	}
+
 	gochan := gp.queue.Pop()
 	if gochan == nil {
 		return ErrNotIdle
@@ -83,35 +87,30 @@ func (gp *goPool) Send(v interface{}, ttls ...time.Duration) error {
 	return nil
 }
 
-// 增加容量
-func (gp *goPool) Add(x int) {
-	if x <= 0 {
-		return
-	}
-	gp.rwMux.Lock()
-	defer gp.rwMux.Unlock()
-
-	gp.size += x
-	gp.queue.Expan(x, gp.goFunc)
-}
-
-// 减少容量
-func (gp *goPool) Done(x int) {
-	if x <= 0 {
-		return
-	}
-	if x > gp.size {
-		x = gp.size
-	}
+// 增加/减少容量
+func (gp *goPool) Expand(x int) {
 	if x == 0 {
 		return
 	}
 
 	gp.rwMux.Lock()
 	defer gp.rwMux.Unlock()
+	gp.size += x
+	if x > 0 {
+		gp.queue.Expand(x, gp.goFunc)
+		return
+	}
+	gp.done(-1 * x)
+}
+
+// 减少容量
+func (gp *goPool) done(x int) {
+	if x > gp.size {
+		x = gp.size
+	}
 
 	gp.size -= x
-	gp.queue.Expan(-1*x, gp.goFunc)
+	gp.queue.Expand(-1*x, gp.goFunc)
 
 	for i := 0; i < x; i++ {
 		gochan := gp.queue.Pop()
@@ -127,4 +126,25 @@ func (gp *goPool) Wait() {
 
 func (gp *goPool) Cap() int {
 	return gp.size
+}
+
+func (gp *goPool) Stop() {
+	gp.rwMux.Lock()
+	defer gp.rwMux.Unlock()
+	if gp.isStop {
+		return
+	}
+	gp.isStop = true
+	gp.done(gp.size)
+}
+
+func (gp *goPool) Reset() {
+	gp.rwMux.Lock()
+	defer gp.rwMux.Unlock()
+	gp.Stop()
+	gp.size = 0
+	gp.isStart = false
+	gp.isStop = false
+	gp.sendTTL = time.NewTicker(1 * time.Second)
+	gp.queue = newQueue(0)
 }

@@ -4,8 +4,9 @@ import "time"
 
 type Pooler interface {
 	Send(interface{}, ...time.Duration) error
-	Add(int)
-	Done(int)
+	Expand(int)
 	Cap() int
 	Wait()
+	Stop()
+	Reset()
 }
