@@ -37,14 +37,15 @@ import "github.com/youngbloood/gopool"
 
 func Run(v interface{})error{
      // todo
+     // ...
      return nil
 }
 ```
 ```
 pool := gopool.New(5, Run)
-pool.StartGo()                // now goroutine number is 5 in pool
-pool.Add(2)                   // now goroutine number is 7 in pool
-pool.Done(4)                  // now goroutine number is 3 in pool
+pool.StartGo()                   // now goroutine number is 5 in pool
+pool.Expand(2)                   // now goroutine number is 7 in pool
+pool.Expand(-4)                  // now goroutine number is 3 in pool
 pool.Send(v)
 ```
 
