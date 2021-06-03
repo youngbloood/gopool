@@ -24,21 +24,21 @@ func _log(index string, t *testing.T, err error, i int) {
 func TestGoPool(t *testing.T) {
 	pool := gopool.New(0, run)
 	pool.StartGo()
-	pool.Add(1)
+	pool.Expand(1)
 	_log("0", t, pool.Send("aa"), pool.Cap()) // cap is 1
 
-	pool.Add(1)
+	pool.Expand(1)
 	_log("1", t, pool.Send("bb"), pool.Cap()) // cap is 2
 
-	pool.Done(2)
+	pool.Expand(-2)
 	_log("2", t, pool.Send("cc"), pool.Cap()) // cap is 0
 
-	pool.Done(1)
-	pool.Done(1)
+	pool.Expand(-1)
+	pool.Expand(-1)
 	time.Sleep(3 * time.Second)
 	_log("3", t, pool.Send("dd"), pool.Cap()) // cap is 0
 
-	pool.Add(1)
+	pool.Expand(1)
 	time.Sleep(3 * time.Second)               // wait the goroutine started!
 	_log("4", t, pool.Send("ee"), pool.Cap()) // cap is 1
 }
@@ -49,7 +49,7 @@ func TestGoPoolAdd(t *testing.T) {
 
 	pool.StartGo()
 	_log("2", t, nil, pool.Cap()) // cap is 5
-	pool.Add(2)
+	pool.Expand(2)
 
 	time.Sleep(3 * time.Second)
 	_log("3", t, nil, pool.Cap()) // cap is 7
@@ -60,7 +60,7 @@ func TestGoPoolDone(t *testing.T) {
 	_log("0", t, nil, pool.Cap()) // cap is 5
 	pool.StartGo()
 	_log("1", t, nil, pool.Cap()) // cap is 5
-	pool.Done(2)
+	pool.Expand(-2)
 	time.Sleep(3 * time.Second)
 	_log("2", t, nil, pool.Cap()) // cap is 3
 }
@@ -71,7 +71,7 @@ func TestGoPoolZero(t *testing.T) {
 	pool.StartGo()
 
 	_log("1", t, pool.Send(1), pool.Cap()) // cap is 0
-	pool.Add(1)
+	pool.Expand(1)
 	time.Sleep(3 * time.Second)
 	_log("3", t, nil, pool.Cap()) // cap is 1
 }
@@ -88,7 +88,7 @@ func TestGoPoolSend(t *testing.T) {
 	check(pool.Send("777777"))
 	check(pool.Send("888888"))
 	fmt.Println("增加容量")
-	pool.Add(2) // cap is 7
+	pool.Expand(2) // cap is 7
 	// stop(1 * time.Second)
 	check(pool.Send("999999"))
 	check(pool.Send("aaaaaa"))
@@ -98,7 +98,7 @@ func TestGoPoolSend(t *testing.T) {
 	check(pool.Send("eeeeee"))
 	check(pool.Send("ffffff"))
 	fmt.Println("减少容量")
-	pool.Done(6) // cap is 1
+	pool.Expand(-6) // cap is 1
 	// stop(1 * time.Second)
 	check(pool.Send("gggggg"))
 	check(pool.Send("hhhhhh"))
