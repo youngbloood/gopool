@@ -22,7 +22,7 @@ goroutine pool in golang. you can expan the goroutine number dynamic.
 |(linklist)  /                            \            |
 |    ______ /                              \ ______    |
 |   | go 1 |                                | go n |   |         
-|   |chan 1|(node 1)       ...              |chan n|   |
+|   |chan 1|(node 1)   ->  ...     ->->     |chan n|   |
 |   |______|                                |______|   |
 |______________________________________________________|
 ```
@@ -185,7 +185,7 @@ A: if recieve ErrNotIdle , may be the goroutine pool size is 0, and invoke `.Exp
 
 Q: how deal with ErrTimeOut?
 
-A: then pool get a channel from queue, and send a v(interface{}) into the queue , it may be timeout, if recieve ErrTimeOut, then you can send many times.
+A: then pool get a channel from queue, and send a v(interface{}) into the queue , it may be timeout. If recieve ErrTimeOut, then you can send many times.
 
 Q: how much size should set in goroutine pool?
 
@@ -194,7 +194,7 @@ A: refer the benchmark.
 
 Q: how to work with queue and queue.Pop()?
 
-A: queue is a double link list, Pop() the head and return head-node, and then push the node into queue tail, then pool can send v into the head-node's channel.
+A: queue is a double link list, Pop() the head and return head-node, and then push the node into queue's tail, then pool can send v into the head-node's channel.
 
 
 Q: when invoke function `.Expand(reduce int)` to reduce the goroutine in pool, Will the data be lost?
