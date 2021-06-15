@@ -21,9 +21,9 @@ goroutine pool in golang. you can expan the goroutine number dynamic.
 | queue       /                          \             |
 |(linklist)  /                            \            |
 |    ______ /                              \ ______    |
-|   | go 1 |                                | go n |   |         
-|   |chan 1|(node 1)   ->  ...     ->->     |chan n|   |
-|   |______|                                |______|   |
+|   | go 1 |           ->          ->->     | go n |   |         
+|   |chan 1|(node 1)       ...              |chan n|   |
+|   |______|           <-          <-<-     |______|   |
 |______________________________________________________|
 ```
 
