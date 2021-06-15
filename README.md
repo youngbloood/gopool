@@ -7,9 +7,10 @@ goroutine pool in golang. you can expan the goroutine number dynamic.
 # mode
 ```
                            v
-                           | 
-                           |Send(v)
-               ____________|____________
+                           |
+                           | Send(v)
+                           |
+               ___________\|/___________
               |  1.get chan roundrobin  |
               |      2.chan<-v          |
               |_________________________|
@@ -19,11 +20,12 @@ goroutine pool in golang. you can expan the goroutine number dynamic.
                 /                      \
  ______________/________________________\______________
 | queue       /                          \             |
-|(linklist)  /                            \            |
+|(double link/ list)                      \            |
 |    ______ /                              \ ______    |
 |   | go 1 |           ->          ->->     | go n |   |         
-|   |chan 1|(node 1)       ...              |chan n|   |
+|   |chan 1|               ...              |chan n|   |
 |   |______|           <-          <-<-     |______|   |
+|    node 1                                  node n    |
 |______________________________________________________|
 ```
 
