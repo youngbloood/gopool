@@ -15,7 +15,12 @@ type goPool struct {
 	sendTTL         *time.Ticker
 }
 
-func New(size int, run Run) *goPool {
+func New(size int, runs ...Run) *goPool {
+	var run Run
+	if len(runs) > 0 {
+		run = runs[0]
+	}
+
 	return &goPool{
 		size:    size,
 		run:     run,
@@ -50,7 +55,17 @@ func (gp *goPool) goFunc(gc *goChan) {
 	}()
 
 	for v := range gc.dataChan {
-		if err := gp.run(v); err != nil {
+		var err error
+		if run2, ok := v.(Run2); ok {
+			err = run2()
+		} else if gp.run != nil {
+			err = gp.run(v)
+		} else {
+			hook.HookErr(errHandle)
+			continue
+		}
+
+		if err != nil {
 			if hookErr, ok := v.(HookError); ok {
 				hookErr.HookErr(err)
 			} else {
