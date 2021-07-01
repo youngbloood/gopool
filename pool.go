@@ -110,8 +110,8 @@ func (gp *goPool) Expand(x int) {
 
 	gp.rwMux.Lock()
 	defer gp.rwMux.Unlock()
-	gp.size += x
 	if x > 0 {
+		gp.size += x
 		gp.queue.Expand(x, gp.goFunc)
 		return
 	}
